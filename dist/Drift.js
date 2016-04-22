@@ -1,13 +1,17 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Drift = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _dom = require('./util/dom');
 
 var _injectBaseStylesheet = require('./injectBaseStylesheet');
 
 var _injectBaseStylesheet2 = _interopRequireDefault(_injectBaseStylesheet);
+
+var _ImageHighlighter = require('./ImageHighlighter');
+
+var _ImageHighlighter2 = _interopRequireDefault(_ImageHighlighter);
 
 var _Trigger = require('./Trigger');
 
@@ -21,7 +25,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-module.exports = (function () {
+module.exports = function () {
   function Drift(triggerEl) {
     var _this = this;
 
@@ -106,23 +110,40 @@ module.exports = (function () {
     // Add base styles to the page. See the "Theming"
     // section of README.md for more information.
     injectBaseStyles = _options$injectBaseSt === undefined ? true : _options$injectBaseSt;
+    var _options$highlightIma = options.highlightImage;
+    var
+    // Highlight the region of the image that is being zoomed.
+    highlightImage = _options$highlightIma === undefined ? true : _options$highlightIma;
+    var _options$highlightCol = options.highlightColor;
+    var
+    // The color of the highlight. Only matters if `highlightImage` = true.
+    highlightColor = _options$highlightCol === undefined ? 'rgba(0, 0, 0, 0.5)' : _options$highlightCol;
+
 
     if (inlinePane !== true && !(0, _dom.isDOMElement)(paneContainer)) {
       throw new TypeError('`paneContainer` must be a DOM element when `inlinePane !== true`');
     }
 
-    this.settings = { namespace: namespace, showWhitespaceAtEdges: showWhitespaceAtEdges, containInline: containInline, inlineOffsetX: inlineOffsetX, inlineOffsetY: inlineOffsetY, sourceAttribute: sourceAttribute, zoomFactor: zoomFactor, paneContainer: paneContainer, inlinePane: inlinePane, handleTouch: handleTouch, onShow: onShow, onHide: onHide, injectBaseStyles: injectBaseStyles };
+    this.settings = { namespace: namespace, showWhitespaceAtEdges: showWhitespaceAtEdges, containInline: containInline, inlineOffsetX: inlineOffsetX, inlineOffsetY: inlineOffsetY, sourceAttribute: sourceAttribute, zoomFactor: zoomFactor, paneContainer: paneContainer, inlinePane: inlinePane, handleTouch: handleTouch, onShow: onShow, onHide: onHide, injectBaseStyles: injectBaseStyles, highlightImage: highlightImage, highlightColor: highlightColor };
 
     if (this.settings.injectBaseStyles) {
       (0, _injectBaseStylesheet2.default)();
     }
 
     // this._bindEvents();
+    this._buildImageHighlighter();
     this._buildZoomPane();
     this._buildTrigger();
   }
 
   _createClass(Drift, [{
+    key: '_buildImageHighlighter',
+    value: function _buildImageHighlighter() {
+      if (this.settings.highlightImage) {
+        this.imageHighlighter = new _ImageHighlighter2.default(this.triggerEl, this.settings.highlightColor);
+      }
+    }
+  }, {
     key: '_buildZoomPane',
     value: function _buildZoomPane() {
       this.zoomPane = new _ZoomPane2.default({
@@ -142,6 +163,7 @@ module.exports = (function () {
       this.trigger = new _Trigger2.default({
         el: this.triggerEl,
         zoomPane: this.zoomPane,
+        imageHighlighter: this.imageHighlighter,
         handleTouch: this.settings.handleTouch,
         onShow: this.settings.onShow,
         onHide: this.settings.onHide,
@@ -165,16 +187,105 @@ module.exports = (function () {
   }]);
 
   return Drift;
-})();
+}();
 
-},{"./Trigger":2,"./ZoomPane":3,"./injectBaseStylesheet":4,"./util/dom":5}],2:[function(require,module,exports){
+},{"./ImageHighlighter":2,"./Trigger":3,"./ZoomPane":4,"./injectBaseStylesheet":5,"./util/dom":6}],2:[function(require,module,exports){
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+module.exports = function () {
+  function ImageHighlighter(imageElement, highlightColor) {
+    _classCallCheck(this, ImageHighlighter);
+
+    this.imageElement = imageElement;
+    this.highlightColor = highlightColor;
+  }
+
+  _createClass(ImageHighlighter, [{
+    key: '_buildCanvas',
+    value: function _buildCanvas() {
+      var imageBB = this.imageElement.getBoundingClientRect();
+      var bodyBB = document.body.getBoundingClientRect();
+
+      // Draw a canvas
+      if (!this.canvas) {
+        this.canvas = document.createElement('canvas');
+        document.body.appendChild(this.canvas);
+      }
+
+      this.canvas.width = imageBB.width;
+      this.canvas.height = imageBB.height;
+
+      this.canvas.style.setProperty('position', 'absolute');
+      this.canvas.style.setProperty('left', imageBB.left + 'px');
+      this.canvas.style.setProperty('top', imageBB.top + 'px');
+
+      this.canvas.style.setProperty('pointer-events', 'none');
+
+      this.ctx = this.canvas.getContext('2d');
+      this.ctx.fillStyle = this.highlightColor;
+    }
+  }, {
+    key: 'setPosition',
+    value: function setPosition(percentageOffsetX, percentageOffsetY) {
+      if (this.highlightSize) {
+        var top = percentageOffsetY * this.imageElement.clientHeight - this.highlightSize.height / 2;
+        var left = percentageOffsetX * this.imageElement.clientWidth - this.highlightSize.width / 2;
+
+        if (top < 0) {
+          top = 0;
+        } else if (top + this.highlightSize.height > this.canvas.height) {
+          top = this.canvas.height - this.highlightSize.height;
+        }
+
+        if (left < 0) {
+          left = 0;
+        } else if (left + this.highlightSize.width > this.canvas.width) {
+          left = this.canvas.width - this.highlightSize.width;
+        }
+
+        // TODO: Try to match the border radius of the zoom element
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(left, top, this.highlightSize.width, this.highlightSize.height);
+      }
+    }
+  }, {
+    key: 'show',
+    value: function show(zoomPane) {
+      this._buildCanvas();
+
+      var zoomPaneSize = zoomPane.getSize();
+      this.zoomPaneAR = zoomPaneSize.width / zoomPaneSize.height;
+      this.zoomFactor = zoomPane.settings.zoomFactor;
+      this.highlightSize = {
+        width: zoomPaneSize.width / this.zoomFactor,
+        height: zoomPaneSize.height / this.zoomFactor
+      };
+
+      this.canvas.style.setProperty('display', 'block');
+    }
+  }, {
+    key: 'hide',
+    value: function hide() {
+      this.canvas.style.setProperty('display', 'none');
+    }
+  }]);
+
+  return ImageHighlighter;
+}();
+
+},{}],3:[function(require,module,exports){
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _throwIfMissing = require('./util/throwIfMissing');
 
@@ -184,7 +295,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Trigger = (function () {
+var Trigger = function () {
   function Trigger() {
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -204,8 +315,12 @@ var Trigger = (function () {
     var onShow = _options$onShow === undefined ? null : _options$onShow;
     var _options$onHide = options.onHide;
     var onHide = _options$onHide === undefined ? null : _options$onHide;
+    var _options$imageHighlig = options.imageHighlighter;
+    var imageHighlighter = _options$imageHighlig === undefined ? null : _options$imageHighlig;
 
-    this.settings = { el: el, zoomPane: zoomPane, sourceAttribute: sourceAttribute, handleTouch: handleTouch, onShow: onShow, onHide: onHide };
+
+    this.settings = { el: el, zoomPane: zoomPane, sourceAttribute: sourceAttribute, handleTouch: handleTouch, onShow: onShow,
+      onHide: onHide, imageHighlighter: imageHighlighter };
 
     this._bindEvents();
   }
@@ -244,7 +359,7 @@ var Trigger = (function () {
   }]);
 
   return Trigger;
-})();
+}();
 
 var _initialiseProps = function _initialiseProps() {
   var _this = this;
@@ -259,6 +374,10 @@ var _initialiseProps = function _initialiseProps() {
 
     _this.settings.zoomPane.show(_this.settings.el.getAttribute(_this.settings.sourceAttribute), _this.settings.el.clientWidth);
 
+    if (_this.settings.imageHighlighter) {
+      _this.settings.imageHighlighter.show(_this.settings.zoomPane, _this.settings.el);
+    }
+
     _this._handleMovement(e);
   };
 
@@ -271,6 +390,10 @@ var _initialiseProps = function _initialiseProps() {
     }
 
     _this.settings.zoomPane.hide();
+
+    if (_this.settings.imageHighlighter) {
+      _this.settings.imageHighlighter.hide();
+    }
   };
 
   this._handleMovement = function (e) {
@@ -280,8 +403,8 @@ var _initialiseProps = function _initialiseProps() {
       return;
     }
 
-    var movementX = undefined,
-        movementY = undefined;
+    var movementX = void 0,
+        movementY = void 0;
 
     if (e.touches) {
       var firstTouch = e.touches[0];
@@ -301,19 +424,23 @@ var _initialiseProps = function _initialiseProps() {
     var percentageOffsetY = offsetY / _this.settings.el.clientHeight;
 
     _this.settings.zoomPane.setPosition(percentageOffsetX, percentageOffsetY, rect);
+
+    if (_this.settings.imageHighlighter) {
+      _this.settings.imageHighlighter.setPosition(percentageOffsetX, percentageOffsetY);
+    }
   };
 };
 
 exports.default = Trigger;
 
-},{"./util/throwIfMissing":6}],3:[function(require,module,exports){
+},{"./util/throwIfMissing":7}],4:[function(require,module,exports){
 'use strict';
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _throwIfMissing = require('./util/throwIfMissing');
 
@@ -329,7 +456,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // account for, just in case.
 var HAS_ANIMATION = typeof document === 'undefined' ? false : 'animation' in document.createElement('div').style;
 
-var ZoomPane = (function () {
+var ZoomPane = function () {
   function ZoomPane() {
     var _this = this;
 
@@ -381,6 +508,7 @@ var ZoomPane = (function () {
     var _options$inlineOffset2 = options.inlineOffsetY;
     var inlineOffsetY = _options$inlineOffset2 === undefined ? 0 : _options$inlineOffset2;
 
+
     this.settings = { container: container, zoomFactor: zoomFactor, inline: inline, namespace: namespace, showWhitespaceAtEdges: showWhitespaceAtEdges, containInline: containInline, inlineOffsetX: inlineOffsetX, inlineOffsetY: inlineOffsetY };
     this.settings.inlineContainer = document.body;
 
@@ -426,6 +554,14 @@ var ZoomPane = (function () {
     key: '_setImageSize',
     value: function _setImageSize(triggerWidth) {
       this.imgEl.style.width = triggerWidth * this.settings.zoomFactor + 'px';
+    }
+  }, {
+    key: 'getSize',
+    value: function getSize() {
+      return {
+        width: this.el.clientWidth,
+        height: this.el.clientHeight
+      };
     }
 
     // `percentageOffsetX` and `percentageOffsetY` must be percentages
@@ -551,11 +687,11 @@ var ZoomPane = (function () {
   }]);
 
   return ZoomPane;
-})();
+}();
 
 exports.default = ZoomPane;
 
-},{"./util/dom":5,"./util/throwIfMissing":6}],4:[function(require,module,exports){
+},{"./util/dom":6,"./util/throwIfMissing":7}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -579,18 +715,18 @@ function injectBaseStylesheet() {
   head.insertBefore(styleEl, head.firstChild);
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 exports.isDOMElement = isDOMElement;
 exports.addClasses = addClasses;
 exports.removeClasses = removeClasses;
-
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-
 // This is not really a perfect check, but works fine.
 // From http://stackoverflow.com/questions/384286
 var HAS_DOM_2 = (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === 'object';
@@ -611,7 +747,7 @@ function removeClasses(el, classNames) {
   });
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

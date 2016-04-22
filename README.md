@@ -84,6 +84,11 @@ var options = {
 	// Add base styles to the page. See the "Theming"
 	// section of README.md for more information.
 	injectBaseStyles: true,
+  // Highlight the region of the image that is being zoomed.
+  highlightImage: false,
+  // The color of the highlight. Only matters if `highlightImage` =
+  // true.
+  highlightColor: 'rgba(0, 0, 0, 0.5)'
 };
 
 new Drift(document.querySelector('img'), options);

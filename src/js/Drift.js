@@ -1,6 +1,7 @@
 import { isDOMElement } from './util/dom';
 import injectBaseStylesheet from './injectBaseStylesheet';
 
+import ImageHighlighter from './ImageHighlighter';
 import Trigger from './Trigger';
 import ZoomPane from './ZoomPane';
 
@@ -55,19 +56,24 @@ module.exports = class Drift {
       // Add base styles to the page. See the "Theming"
       // section of README.md for more information.
       injectBaseStyles = true,
+      // Highlight the region of the image that is being zoomed.
+      highlightImage = false,
+      // The color of the highlight. Only matters if `highlightImage` = true.
+      highlightColor = 'rgba(0, 0, 0, 0.5)'
     } = options;
 
     if (inlinePane !== true && !isDOMElement(paneContainer)) {
       throw new TypeError('`paneContainer` must be a DOM element when `inlinePane !== true`');
     }
 
-    this.settings = { namespace, showWhitespaceAtEdges, containInline, inlineOffsetX, inlineOffsetY, sourceAttribute, zoomFactor, paneContainer, inlinePane, handleTouch, onShow, onHide, injectBaseStyles };
+    this.settings = { namespace, showWhitespaceAtEdges, containInline, inlineOffsetX, inlineOffsetY, sourceAttribute, zoomFactor, paneContainer, inlinePane, handleTouch, onShow, onHide, injectBaseStyles, highlightImage, highlightColor };
 
     if (this.settings.injectBaseStyles) {
       injectBaseStylesheet();
     }
 
     // this._bindEvents();
+    this._buildImageHighlighter();
     this._buildZoomPane();
     this._buildTrigger();
   }
@@ -83,6 +89,13 @@ module.exports = class Drift {
   set zoomFactor(zf) {
     this.settings.zoomFactor = zf;
     this.zoomPane.settings.zoomFactor = zf;
+  }
+
+  _buildImageHighlighter() {
+    if (this.settings.highlightImage) {
+      this.imageHighlighter = new ImageHighlighter(
+        this.triggerEl, this.settings.highlightColor);
+    }
   }
 
   _buildZoomPane() {
@@ -102,6 +115,7 @@ module.exports = class Drift {
     this.trigger = new Trigger({
       el: this.triggerEl,
       zoomPane: this.zoomPane,
+      imageHighlighter: this.imageHighlighter,
       handleTouch: this.settings.handleTouch,
       onShow: this.settings.onShow,
       onHide: this.settings.onHide,

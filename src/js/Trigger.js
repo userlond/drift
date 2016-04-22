@@ -9,9 +9,11 @@ export default class Trigger {
       handleTouch = throwIfMissing(),
       onShow = null,
       onHide = null,
+      imageHighlighter = null,
     } = options;
 
-    this.settings = { el, zoomPane, sourceAttribute, handleTouch, onShow, onHide };
+    this.settings = { el, zoomPane, sourceAttribute, handleTouch, onShow,
+      onHide, imageHighlighter };
 
     this._bindEvents();
   }
@@ -57,6 +59,12 @@ export default class Trigger {
       this.settings.el.clientWidth
     );
 
+    if (this.settings.imageHighlighter) {
+      this.settings.imageHighlighter.show(
+        this.settings.zoomPane,
+        this.settings.el);
+    }
+
     this._handleMovement(e);
   };
 
@@ -68,7 +76,11 @@ export default class Trigger {
       onHide();
     }
 
-    this.settings.zoomPane.hide()
+    this.settings.zoomPane.hide();
+
+    if (this.settings.imageHighlighter) {
+      this.settings.imageHighlighter.hide();
+    }
   };
 
   _handleMovement = (e) => {
@@ -99,5 +111,10 @@ export default class Trigger {
 
     this.settings.zoomPane.setPosition(percentageOffsetX,
       percentageOffsetY, rect);
+
+    if (this.settings.imageHighlighter) {
+      this.settings.imageHighlighter.setPosition(
+        percentageOffsetX, percentageOffsetY);
+    }
   };
 }

@@ -19,6 +19,8 @@ export function defaultDriftConfig() {
     onShow: null,
     onHide: null,
     injectBaseStyles: true,
+    highlightImage: false,
+    highlightColor: 'rgba(0, 0, 0, 0.5)',
   };
 }
 
@@ -39,6 +41,7 @@ export function triggerOptions() {
   return {
     el: document.querySelector('.test-anchor'),
     zoomPane: new ZoomPane(zoomPaneOptions()),
+    imageHighlighter: null,
     sourceAttribute: 'data-zoom',
     handleTouch: true,
     onShow: null,
