@@ -12,6 +12,7 @@ module.exports = class ImageHighlighter {
     if (!this.canvas) {
       this.canvas = document.createElement('canvas');
       document.body.appendChild(this.canvas);
+      this.canvas.classList.add('drift-image-highlighter');
     }
 
     this.canvas.width = imageBB.width;

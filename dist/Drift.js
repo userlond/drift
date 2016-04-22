@@ -113,7 +113,7 @@ module.exports = function () {
     var _options$highlightIma = options.highlightImage;
     var
     // Highlight the region of the image that is being zoomed.
-    highlightImage = _options$highlightIma === undefined ? true : _options$highlightIma;
+    highlightImage = _options$highlightIma === undefined ? false : _options$highlightIma;
     var _options$highlightCol = options.highlightColor;
     var
     // The color of the highlight. Only matters if `highlightImage` = true.
@@ -194,6 +194,8 @@ module.exports = function () {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _dom = require('./util/dom');
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 module.exports = function () {
@@ -214,6 +216,7 @@ module.exports = function () {
       if (!this.canvas) {
         this.canvas = document.createElement('canvas');
         document.body.appendChild(this.canvas);
+        this.canvas.classList.add('drift-image-highlighter');
       }
 
       this.canvas.width = imageBB.width;
@@ -278,7 +281,7 @@ module.exports = function () {
   return ImageHighlighter;
 }();
 
-},{}],3:[function(require,module,exports){
+},{"./util/dom":6}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
